@@ -6,4 +6,4 @@ lib/
 include/
 bin/
 pyvenv.cfg
-API/config/server_list.conf
+server_list.conf

@@ -1,8 +1,97 @@
 from os.path import exists
+from os import mkdir
+
+
 # JUST TO MAKE CODE A BIT READABLE
 
+def get_config() -> str:
+    with open("config/server_list.conf") as f:
+        result = ""
+        for line in f:
+            line = line.replace(" ", "")
+            if "#" in line:
+                line = line[:line.find("#")]
+            if not line:
+                continue
+            result += line + "\n"
+    return result[:-1]
+
+
+
+def dictify_all() -> list:
+    servers = get_config()
+    ar = []
+    for server in servers.split():
+        i = server.find("://")
+        proto = server[:i]
+        server = server[i+3:]
+
+        i = server.find(":")
+        username = server[:i]
+        server = server[i+1:]
+
+        i = server.find("@")
+        password = server[:i]
+        server = server[i+1:]
+
+        i = server.find(":")
+        domain = server[:i]
+        server = server[i+1:]
+
+        i = server.find("/")
+        port = server[:i]
+        server = server[i+1:]
+
+        path = server
+        ar.append({
+                "proto": proto,
+                "username": username,
+                "password": password,
+                "domain": domain,
+                "port": port,
+                'path': path
+            })
+    return ar
+
+
+
+def dictify_by_domain(domain: str) -> dict:
+    servers = get_config()
+    # <proto>://<us>:<pswd>@<dmn>:<port>/<path>
+    for server in servers.split():
+        if f"@{domain}:" in server:
+            i = server.find("://")
+            proto = server[:i]
+            server = server[i+3:]
+
+            i = server.find(":")
+            username = server[:i]
+            server = server[i+1:]
+
+            i = server.find("@")
+            password = server[:i]
+            server = server[i+1:]
+
+            i = server.find(":")
+            domain = server[:i]
+            server = server[i+1:]
+
+            i = server.find("/")
+            port = server[:i]
+            server = server[i+1:]
+            
+            path = server
+            return {
+                "proto": proto,
+                "username": username,
+                "password": password,
+                "domain": domain,
+                "port": port,
+                "path": path
+            }
+
 def server_link(server: dict) -> str:
-    return f"https://{server['domain']}:{server["panel_port"]}/{server["secret_path"]}"
+    return f"https://{server['domain']}:{server["port"]}/{server["path"]}"
 
 # SETTING UP SERVERS
 
@@ -13,16 +102,16 @@ def is_right_link(link: str) -> None:
 # TODO inline server assignment
 # TODO adding new servers
 def generate_servers() -> None:
-
+    if not exists("config"): mkdir("config")
     if not exists("config/server_list.conf"):
         with open("config/server_list.conf", "w") as f:
             
 
-            f.write("""// HERE'S THE TEMPLATE FOR ASSIGNING VPN-SERVER RUNNING 3X-UI
-//
-// <proto>://<username>:<password>@<hostname>:<port>/<secret_path>/
-//
-// EXAMPLE: https://coolname:s3Cr$t@example.com:443/UltRAM3g4SUpaSecretYeow/\n""")
+            f.write("""# HERE'S THE TEMPLATE FOR ASSIGNING VPN-SERVER RUNNING 3X-UI
+#
+# <proto>://<username>:<password>@<hostname>:<port>/<secret_path>/
+#
+# EXAMPLE: https://coolname:s3Cr$t@example.com:443/UltRAM3g4SUpaSecretYeow/\n""")
 
 
             print("Can't find server_list.conf. Let's create it from scratch")
@@ -43,38 +132,6 @@ def generate_servers() -> None:
                 print("No server added. Lookup config/server_list.conf to assign later")
             else:
                 print(f"Added {cnt} server{"s" if cnt != 1 else ""}")
-    servers = []
-    with open("config/server_list.conf") as f:
-        print("Found server_list.conf")
-        for line in f:
-            line = line.replace(" ", "")
-            if "//" in line:
-                line[line.find("//"):]
-            if not line:
-                continue
-            i = line.find("://")
-            proto = line[:i]
-            line = line[i+3]
-
-            i = line.find(":")
-            username = line[:i]
-            line = line[i+1:]
-
-            i = line.find("@")
-            password = line[:i]
-            line = line[i+1:]
-
-            i = line.find(":")
-            domain = line[:i]
-            line = line[i+1:]
-
-            i = line.find("/")
-            port = line[:i]
-            line = line[i+1]
-
-            path = line[1:]
-
-            print(proto, username, password, domain, port, path)
 
 if __name__ == "__main__":
-    generate_servers()
+    print(dictify_all())
