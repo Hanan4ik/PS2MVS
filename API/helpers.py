@@ -53,7 +53,39 @@ def dictify_all() -> list:
             })
     return ar
 
+def dictify_first():
+    server = get_config().split()[0]
+    i = server.find("://")
+    proto = server[:i]
+    server = server[i+3:]
 
+    i = server.find(":")
+    username = server[:i]
+    server = server[i+1:]
+
+    i = server.find("@")
+    password = server[:i]
+    server = server[i+1:]
+
+    i = server.find(":")
+    domain = server[:i]
+    server = server[i+1:]
+
+    i = server.find("/")
+    port = server[:i]
+    server = server[i+1:]
+            
+    path = server
+    return {
+        "proto": proto,
+        "username": username,
+        "password": password,
+        "domain": domain,
+        "port": port,
+        "path": path
+    }
+
+   
 
 def dictify_by_domain(domain: str) -> dict:
     servers = get_config()
