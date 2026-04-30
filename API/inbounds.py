@@ -29,6 +29,9 @@ def get_client_by_tg(tgId):
             return client
     return None
 
+def new_client(tgId):
+    pass
+
 if __name__ == "__main__":
    
     print(get_client_by_tg(1053108666))
