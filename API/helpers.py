@@ -133,37 +133,58 @@ def is_right_link(link: str) -> None:
 
 # TODO inline server assignment
 # TODO adding new servers
-def generate_servers() -> None:
+def generate_servers_config(force: bool = False) -> None:
     if not exists("config"): mkdir("config")
-    if not exists("config/server_list.conf"):
-        with open("config/server_list.conf", "w") as f:
+    if exists("config/server_list.conf") and not force:
+        print("Servers already assigned")
+        return
+
+    with open("config/server_list.conf", "w") as f:
             
 
-            f.write("""# HERE'S THE TEMPLATE FOR ASSIGNING VPN-SERVER RUNNING 3X-UI
+        f.write("""# HERE'S THE TEMPLATE FOR ASSIGNING VPN-SERVER RUNNING 3X-UI
 #
 # <proto>://<username>:<password>@<hostname>:<port>/<secret_path>/
 #
 # EXAMPLE: https://coolname:s3Cr$t@example.com:443/UltRAM3g4SUpaSecretYeow/\n""")
 
 
-            print("Can't find server_list.conf. Let's create it from scratch")
-            cnt = 0
-            while input("Do you wish to continue? [Y/n]").lower() != "n":
-                proto = input("Enter protocol of accessing panel (http/https): ")
-                domain = input("Enter ip/domain of server: ")
-                port = input("Enter panel access port: ")
-                path = input("Enter path(endpoint) to access panel: ")
-                if path.startswith("/") and path != "/": path = path[1:]
-                username = input("Enter panel username: ")
-                password = input("Enter panel password: ")
-                link = f"{proto}://{username}:{password}@{domain}:{port}/{path}"
-                f.write(link + "\n")
-                print("Added server")
-                cnt += 1
-            if not cnt:
-                print("No server added. Lookup config/server_list.conf to assign later")
-            else:
-                print(f"Added {cnt} server{"s" if cnt != 1 else ""}")
+        print("Can't find server_list.conf. Let's create it from scratch")
+        cnt = 0
+        while input("Do you wish to continue? [Y/n]").lower() != "n":
+            proto = input("Enter protocol of accessing panel (http/https): ")
+            domain = input("Enter ip/domain of server: ")
+            port = input("Enter panel access port: ")
+            path = input("Enter path(endpoint) to access panel: ")
+            if path.startswith("/") and path != "/": path = path[1:]
+            username = input("Enter panel username: ")
+            password = input("Enter panel password: ")
+            link = f"{proto}://{username}:{password}@{domain}:{port}/{path}"
+            f.write(link + "\n")
+            print("Added server")
+            cnt += 1
+        if not cnt:
+            print("No server added. Lookup config/server_list.conf to assign later")
+        else:
+            print(f"Added {cnt} server{"s" if cnt != 1 else ""}")
+
+def generate_client_config(force: bool = False) -> None:
+    if not exists("config"): mkdir("config")
+    if exists("config/client.conf") and not force:
+        print("Client config already present")
+        return
+    with open("config/client.conf", "w") as f:
+        
+
+# INBOUND HELPERS
+
+def client_param(param: str):
+    with open("config/client.conf") as config:
+        for p in config:
+            p = p.split()
+            if p[0] == param:
+                return p[1]
+    return None
 
 if __name__ == "__main__":
     print(dictify_all())
