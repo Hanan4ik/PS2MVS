@@ -1,5 +1,5 @@
 from requests import get, post
-from helpers import server_link, client_config, dictify_by_domain, dictify_first
+from helpers import server_link, get_random, client_param, dictify_by_domain, dictify_first
 from login import cookie
 from misc import get_uuid
 import json
@@ -16,20 +16,9 @@ class Client:
         self.flow = "" # TODO
         self.comment = comment
         self.reset = client_param("reset")
-
-    def __init__(self, tgId, uuid, email, subid, expiryTime, comment):
-        self.tgId = tgId
-        self.id = uuid
-        self.email = email
-        self.subId = subId
-        self.comment = comment
-        self.flow = "" # TODO
-        self.limitIp = client_param("limitIp")
         self.totalGB = client_param("totalGB")
-        self.expiryTime = expiryTime
-        self.reset = client_param("reset")
 
-    def __dictify(self):
+    def dictify(self):
         return {
             "id": self.id,
             "flow": self.flow,
@@ -45,7 +34,21 @@ class Client:
         }
 
     def jsonify(self):
-        return json.dumps(self.__dictify(), ensure_ascii=False)
+        to_return = '{"clients": [{' \
+        f'\n "id": "{self.id}",' \
+        f'\n "flow": "{self.flow}",' \
+        f'\n "email": "{self.email}",' \
+        f'\n "limitIp": {self.limitIp},' \
+        f'\n "totalGB": {self.totalGB},' \
+        f'\n "expiryTime": {self.expiryTime},' \
+        f'\n "enable": true,' \
+        f'\n "tgId": "{self.tgId}",' \
+        f'\n "subId": "{self.subId}",' \
+        f'\n "comment": "{self.comment}",' \
+        f'\n "reset": {self.reset}\n' \
+        '}]}'
+        self.email = get_random(8)
+        return to_return
 
 # TODO with writed cookie in main
 def get_inbound_list(server: dict, cookie: dict):
@@ -58,7 +61,7 @@ def get_inbound_list(server: dict, cookie: dict):
 
 def get_inbound_list_ids(server: dict, cookie: dict):
 
-    inbounds = get_inbound_list()
+    inbounds = get_inbound_list(server, cookie)
     return [i["id"] for i in inbounds]
 
 # Inbound base
@@ -90,12 +93,14 @@ def get_client_by_tg(server:dict, inbound_id, cookie:dict, tgId):
             return client
     return None
 
-def new_client(server, tgId, cookie):
-    client = Client(1053108667, "Максимка").jsonify()
+# TODO Trojan, vmess, shadowsocks, hysteria. And others later
+def new_client(server:dict, cookie:dict, client:Client):
     for i in get_inbound_list_ids(server, cookie):
-        payload = {''}
-        # TODO
+        payload={'id': i, 'settings': client.jsonify()}
+        response = post(f"{server_link(server)}/panel/api/inbounds/addClient", data=payload, headers={"Accept": "application/json"}, cookies=cookie)
+
 
 if __name__ == "__main__":
-    print(get_client_by_tg(1053108666))
-
+    serv = dictify_by_domain('nefor.site')
+    new_client(serv, cookie(serv), Client(1053108667, 'Test'))
+    get_inbound_list(serv, cookie(serv))

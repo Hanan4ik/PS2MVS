@@ -1,6 +1,7 @@
 from os.path import exists
 from os import mkdir
-
+from string import digits, ascii_letters
+from random import choices 
 
 # JUST TO MAKE CODE A BIT READABLE
 
@@ -16,6 +17,8 @@ def get_config() -> str:
             result += line + "\n"
     return result[:-1]
 
+def get_random(length: int):
+    return ''.join(choices(ascii_letters + digits, k=length))
 
 
 def dictify_all() -> list:
@@ -174,8 +177,14 @@ def generate_client_config(force: bool = False) -> None:
         print("Client config already present")
         return
     with open("config/client.conf", "w") as f:
-        pass
-        #TODO
+        print("Let's create client.conf file")
+        if input("Do you wish to continue [Y/n]").lower() not in "y ":
+            return
+
+        limitIp = input("Enter limit of IPs (0 for unlimited): ")
+        totalGB = input("Enter maximum traffic in GB (0 for unlimited): ")
+        reset = input("Enter how frequently traffic should be reset (0 for no reset): ")
+        f.write(f"limitIp={limitIp}\ntotalGB={totalGB}\nreset={reset}")
         
 
 # INBOUND HELPERS
@@ -183,10 +192,10 @@ def generate_client_config(force: bool = False) -> None:
 def client_param(param: str):
     with open("config/client.conf") as config:
         for p in config:
-            p = p.split()
+            p = p.split("=")
             if p[0] == param:
                 return p[1]
     return None
 
 if __name__ == "__main__":
-    print(dictify_all())
+    generate_client_config(True)

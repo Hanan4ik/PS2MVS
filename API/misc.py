@@ -1,10 +1,12 @@
 from requests import get
-from helpers import dictify_first
+from helpers import dictify_first, server_link
+from login import cookie
 
 def get_uuid():
-    link = server_link(dictify_first())
-    response = get(f"{link}/panel/api/inbounds/list", headers={"Accept": "application/json"}, cookies=cookie)
-    uuid = response.json()['obj']
+    serv = dictify_first()
+    link = server_link(serv)
+    response = get(f"{link}/panel/api/server/getNewUUID", headers={"Accept": "application/json"}, cookies=cookie(serv))
+    uuid = response.json()['obj']['uuid']
     response.close()
     return uuid
 
