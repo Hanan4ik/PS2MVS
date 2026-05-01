@@ -174,6 +174,8 @@ def generate_client_config(force: bool = False) -> None:
         print("Client config already present")
         return
     with open("config/client.conf", "w") as f:
+        pass
+        #TODO
         
 
 # INBOUND HELPERS
