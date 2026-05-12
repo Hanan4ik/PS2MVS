@@ -50,6 +50,14 @@ class Client:
         self.email = get_random(8)
         return to_return
 
+class Server:
+    def __init__(self, config:dict, cookie:dict):
+        self.config = config
+        self.__cookie = cookie
+    
+    def get_cookie(self):
+        pass
+
 # TODO with writed cookie in main
 def get_inbound_list(server: dict, cookie: dict):
 
