@@ -8,3 +8,4 @@ bin/
 pyvenv.cfg
 server_list.conf
 client.conf
+subscription.conf
