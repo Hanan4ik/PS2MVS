@@ -52,3 +52,15 @@ def generate_servers_config(force: bool = False) -> None:
             print("No server added. Lookup config/server_list.conf to assign later")
         else:
             print(f"Added {cnt} server{"s" if cnt != 1 else ""}")
+
+
+def generate_subscription_config(force: bool = False) -> None:
+    if not exists("config"): mkdir("config")
+    if exists("config/subscription.conf") and not force:
+        print("Subscription service already configured")
+        return
+
+    with open("config/server_list.conf", "w") as f:
+
+
+
