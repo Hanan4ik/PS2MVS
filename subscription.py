@@ -1,20 +1,20 @@
 import requests as r
 import base64 as b
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from API.helpers import get_random
 
 # TODO server inbounds
 # server1_inb = url_yeow
 # server_2_inb = url2_yeow
 #...
 #servern_inb = urln_yeow
-
-sub = b.b64encode("\n".join(...).encode('utf-8'))
-
-
-host_name = "localhost" # TODO sys.argv
-port = 8080 # TODO sys.argv
-
 class SubService(BaseHTTPRequestHandler):
+
+    def __init__(self):
+        # TODO parse config
+        self.sub_title = ""
+        self.sub_desc = ""
+
     def GET(self):
         self.send_response(200)
         self.send_header("Content-type", "text/html; charset=utf-8")
@@ -24,9 +24,13 @@ class SubService(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(sub)
 
-if __name__ == "__main__":
-    webServer = HTTPServer((hostName, serverPort), SubService)
-    print(f"Server started http://{host_name}:{port}")
+
+
+def subscription_service(host, port):
+
+    #TODO config sub = b.b64encode("\n".join(...).encode('utf-8'))
+    webServer = HTTPServer((host, port), SubService)
+    print(f"Subscription service started at http://{host}:{port}")
 
     try:
         webServer.serve_forever()
@@ -35,3 +39,6 @@ if __name__ == "__main__":
 
     webServer.server_close()
     print("Server stopped.")
+
+if __name__ == "__main__":
+    subscription_service("localhost", "2096")
